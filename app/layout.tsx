@@ -6,6 +6,7 @@ import "./globals.css";
 import "./geist-system.css";
 import "./compact-system.css";
 import "./card-system.css";
+import "./refinement-system.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://junk-removal-booking.vercel.app"),
