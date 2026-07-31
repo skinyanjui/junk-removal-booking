@@ -9,9 +9,14 @@ import { Button, Card, Input, Textarea } from "@/components/ui";
 type Step = "upload" | "details" | "sent" | "quotes" | "confirm" | "booked";
 type Photo = { name: string; url: string };
 type SortOption = "Recommended" | "Lowest price" | "Soonest pickup" | "Highest rated";
+type PaymentMethod = "Card" | "Apple Pay" | "Google Pay";
 
 const locations = ["Outside or curbside", "Garage", "Inside", "Other"];
-const paymentMethods = ["Card", "Apple Pay", "Google Pay"];
+const paymentMethods: { name: PaymentMethod; mark: string }[] = [
+  { name: "Card", mark: "••••" },
+  { name: "Apple Pay", mark: "A" },
+  { name: "Google Pay", mark: "G" },
+];
 
 export function BookingExperience() {
   const [step, setStep] = useState<Step>("upload");
@@ -24,7 +29,7 @@ export function BookingExperience() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("Card");
   const [statusText, setStatusText] = useState("Quotes are on the way");
   const [quotesReady, setQuotesReady] = useState(false);
   const [sort, setSort] = useState<SortOption>("Recommended");
@@ -183,8 +188,22 @@ export function BookingExperience() {
             <div className="form-stack">
               <label>Name<Input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label>
               <label>Mobile number<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></label>
-              <fieldset><legend>Payment method</legend><div className="choice-grid three">{paymentMethods.map((method) => <button type="button" key={method} className={paymentMethod === method ? "choice selected" : "choice"} onClick={() => setPaymentMethod(method)}>{method}</button>)}</div></fieldset>
-              <div className="authorization">You approve <b>{formatCurrency(selectedQuote.total)}</b>. Any change requires your approval.</div>
+              <fieldset>
+                <legend>Payment</legend>
+                <div className="payment-methods">
+                  {paymentMethods.map((method) => {
+                    const selected = paymentMethod === method.name;
+                    return (
+                      <button type="button" key={method.name} className={selected ? "payment-option selected" : "payment-option"} aria-pressed={selected} onClick={() => setPaymentMethod(method.name)}>
+                        <span className="payment-mark" aria-hidden="true">{method.mark}</span>
+                        <span>{method.name}</span>
+                        {selected ? <CheckIcon /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+              <div className="authorization"><b>{formatCurrency(selectedQuote.total)}</b> approved. Changes require your approval.</div>
               <Button disabled={!name.trim() || phone.trim().length < 7} onClick={() => setStep("booked")}>Book pickup <ArrowRightIcon /></Button>
             </div>
           </div>
