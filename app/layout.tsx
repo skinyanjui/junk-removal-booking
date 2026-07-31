@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "./geist-system.css";
+import "./compact-system.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://junk-removal-booking.vercel.app"),
