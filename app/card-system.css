@@ -1,0 +1,446 @@
+/* Compact card architecture
+   Cards organize decisions rather than adding visual bulk. */
+
+.booking-grid > div > h1,
+.compact-state-panel h1,
+.compact-quote-heading h1 {
+  max-width: 660px;
+  margin-bottom: 18px;
+  font-size: clamp(32px, 4vw, 50px);
+  line-height: 1.02;
+}
+
+.compact-state-panel {
+  max-width: 620px;
+  margin-top: 20px;
+}
+
+.compact-state-panel .success-mark {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+}
+
+.compact-state-panel .success-mark svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* Upload and item summary cards */
+.upload-card {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.item-summary-card {
+  padding: 14px !important;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.compact-empty-preview {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--geist-border-strong);
+  border-radius: 9px;
+  background: var(--geist-surface-subtle);
+  color: var(--geist-text-secondary);
+  font-size: 12px;
+}
+
+.compact-empty-preview svg {
+  width: 18px;
+  height: 18px;
+}
+
+.compact-estimate {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.compact-estimate strong {
+  font-size: 22px;
+}
+
+.compact-estimate p {
+  max-width: 130px;
+  margin: 0;
+  text-align: right;
+}
+
+/* Quote cards become compact comparison rows. */
+.compact-quote-heading {
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.compact-quote-heading h1 {
+  margin-bottom: 0;
+}
+
+.quote-list {
+  display: grid;
+  gap: 8px;
+}
+
+.compact-quote-card {
+  padding: 14px 16px !important;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.compact-quote-card:hover {
+  border-color: var(--geist-border-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.045);
+}
+
+.compact-quote-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.compact-provider-copy {
+  min-width: 0;
+}
+
+.compact-provider-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.compact-provider-title h2 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.compact-provider-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  color: var(--geist-text-secondary);
+  font-size: 12px;
+}
+
+.compact-provider-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.compact-provider-meta svg {
+  width: 13px;
+  height: 13px;
+}
+
+.compact-included {
+  margin: 6px 0 0;
+  overflow: hidden;
+  color: var(--geist-text-tertiary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-quote-price {
+  min-width: 138px;
+  text-align: right;
+}
+
+.compact-quote-price strong {
+  display: block;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 25px;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+}
+
+.compact-quote-price span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--geist-accent-strong);
+  font-size: 12px;
+}
+
+.compact-quote-price svg {
+  width: 13px;
+  height: 13px;
+}
+
+.compact-quote-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.compact-quote-actions .button {
+  min-height: 35px;
+  padding-inline: 12px;
+}
+
+.compact-quote-actions .text-link {
+  padding: 7px 3px;
+}
+
+.compact-quote-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 12px;
+  padding: 11px 0 0;
+  border: 0;
+  border-top: 1px solid var(--geist-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--geist-text-secondary);
+  font-size: 12px;
+}
+
+/* Status, receipt, and confirmation cards */
+.compact-status-card,
+.compact-receipt {
+  padding: 14px 16px !important;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.compact-status-card {
+  margin: 18px 0;
+}
+
+.compact-summary-card {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.compact-summary-card > div {
+  min-height: 74px;
+  padding: 13px 15px;
+  border-right: 1px solid var(--geist-border);
+}
+
+.compact-summary-card > div:last-child {
+  border-right: 0;
+}
+
+.compact-summary-card small {
+  font-size: 11px;
+}
+
+.compact-summary-card b {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.compact-receipt {
+  gap: 4px;
+  margin: 18px 0;
+}
+
+.compact-receipt b {
+  font-size: 24px;
+}
+
+.booking-provider-line {
+  margin: -5px 0 16px;
+  color: var(--geist-text-secondary);
+}
+
+/* Homepage step and trust cards */
+.compact-section-intro {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.compact-how-section {
+  padding-block: 30px !important;
+}
+
+.compact-step-grid,
+.compact-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 0;
+}
+
+.compact-step-grid article,
+.compact-trust-grid article,
+.compact-step-grid article:not(:first-child),
+.compact-trust-grid article:not(:first-child) {
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--geist-border);
+  border-radius: 12px;
+  background: var(--geist-surface);
+  box-shadow: none;
+}
+
+.compact-step-grid i {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+}
+
+.compact-step-grid h3,
+.compact-trust-grid h3 {
+  margin: 0 0 3px;
+  font-size: 15px;
+}
+
+.compact-step-grid p,
+.compact-trust-grid p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.compact-trust-grid svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  margin: 2px 0 0;
+}
+
+/* Provider cards stay operational and compact. */
+.metric-card {
+  min-height: 82px;
+  padding: 12px 15px;
+}
+
+.dashboard-summary,
+.active-job,
+.earnings-card,
+.quote-composer,
+.onboarding-card {
+  box-shadow: none;
+}
+
+.dashboard-summary {
+  padding: 14px !important;
+}
+
+.opportunity-card {
+  border-radius: 11px;
+}
+
+@media (max-width: 900px) {
+  .compact-quote-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .compact-quote-actions {
+    grid-column: 1 / -1;
+  }
+
+  .compact-summary-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .compact-summary-card > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .compact-summary-card > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--geist-border);
+  }
+}
+
+@media (max-width: 720px) {
+  .booking-grid > div > h1,
+  .compact-state-panel h1,
+  .compact-quote-heading h1 {
+    font-size: 34px;
+  }
+
+  .compact-quote-heading {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .compact-quote-main {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .compact-quote-price {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .compact-quote-actions {
+    grid-column: auto;
+  }
+
+  .compact-included {
+    white-space: normal;
+  }
+
+  .compact-step-grid,
+  .compact-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-step-grid article,
+  .compact-trust-grid article,
+  .compact-step-grid article:not(:first-child),
+  .compact-trust-grid article:not(:first-child) {
+    padding: 13px;
+    border: 1px solid var(--geist-border);
+  }
+
+  .compact-how-section {
+    padding-block: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .compact-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-summary-card > div,
+  .compact-summary-card > div:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--geist-border);
+  }
+
+  .compact-summary-card > div:last-child {
+    border-bottom: 0;
+  }
+
+  .compact-estimate {
+    align-items: start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .compact-estimate p {
+    max-width: none;
+    text-align: left;
+  }
+}
