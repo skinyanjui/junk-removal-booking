@@ -8,6 +8,7 @@ import "./compact-system.css";
 import "./card-system.css";
 import "./refinement-system.css";
 import "./booking-flow-system.css";
+import "./booking-progress-system.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://junk-removal-booking.vercel.app"),
