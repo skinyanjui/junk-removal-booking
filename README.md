@@ -1,30 +1,40 @@
 # Junk Removal Booking
 
-A mobile-first marketplace that lets customers request junk removal in a few simple steps and routes qualified jobs to providers based on their selected ZIP-code service areas.
+A mobile-first, photo-first marketplace for requesting junk removal, comparing local provider quotes, and booking a pickup.
 
-## Product principles
+## What is included
 
-- Reduce customer cognitive load.
-- Start the booking immediately from the homepage.
-- Use photos as the primary description of the job.
-- Keep customer and provider experiences clearly separated.
-- Make every navigation item, button, tab, form, and footer link functional.
-- Use a universal responsive header, navigation system, and footer.
-- Give providers a full-width operational dashboard.
+- Customer flow: upload → location/access → request sent → compare quotes → confirm booking.
+- Provider onboarding with ZIP-code coverage selection.
+- Full-width provider dashboard with opportunities, jobs, coverage, and earnings.
+- Simulated routing, quote, booking, and status behavior for prototype testing.
+- Product, architecture, routing, UX, and source-reference documentation.
+- Responsive, keyboard-accessible UI using Geist and a restrained green accent.
 
-## Core customer flow
+## Run locally
 
-1. Enter the job ZIP code.
-2. Upload photos and add essential job details.
-3. Confirm timing and contact information.
-4. Receive matched provider quotes or assignment updates.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Core provider flow
+Open `http://localhost:3000`.
 
-1. Create a provider account.
-2. Complete business, service, coverage, and verification details.
-3. Select ZIP codes and job categories.
-4. Receive relevant job opportunities.
-5. Quote, accept, schedule, message, complete, and close jobs.
+## Validate
 
-See [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) for the initial product scope.
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
+## Product rules
+
+1. Customers see only three stages: **Upload, Quotes, Book**.
+2. Photos replace unnecessary item-classification questions.
+3. Requests are routed to eligible providers; jobs are not assigned automatically.
+4. The customer assigns the job by selecting a submitted quote.
+5. Price increases require explicit customer approval.
+6. Providers choose the ZIP codes where they receive opportunities.
+
+See [`docs/MASTER_PRODUCT_BRIEF.md`](docs/MASTER_PRODUCT_BRIEF.md) for the complete source-of-truth brief.
