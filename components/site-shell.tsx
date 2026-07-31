@@ -13,8 +13,7 @@ export function SiteHeader() {
 
         <nav aria-label="Primary navigation" className="nav-links">
           <Link href="/#services">Services</Link>
-          <Link href="/#how">How it works</Link>
-          <Link href="/#trust">Why choose us</Link>
+          <Link href="/#trust">Safety and pricing</Link>
           <Link href="/provider">For providers</Link>
         </nav>
 
@@ -36,10 +35,10 @@ export function SiteFooter() {
             <span className="brand-mark" aria-hidden="true"><TruckIcon /></span>
             <span className="brand-copy"><b>Junk Removal</b><small>Near Me</small></span>
           </Link>
-          <p>Compare local junk removal quotes and book online.</p>
+          <p>Compare local quotes and book online.</p>
         </div>
         <nav className="footer-nav" aria-label="Footer navigation">
-          <div className="footer-column"><b>Customers</b><Link href="/#booking">Get quotes</Link><Link href="/#how">How it works</Link><Link href="/#trust">Safety and pricing</Link></div>
+          <div className="footer-column"><b>Customers</b><Link href="/#booking">Get quotes</Link><Link href="/#services">Services</Link><Link href="/#trust">Safety and pricing</Link></div>
           <div className="footer-column"><b>Providers</b><Link href="/provider">Join</Link><Link href="/provider/dashboard">Sign in</Link></div>
           <div className="footer-column"><b>Company</b><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/accessibility">Accessibility</Link></div>
         </nav>
