@@ -105,9 +105,7 @@ export function BookingExperience() {
       {step === "upload" && (
         <div className="booking-grid">
           <div>
-            <p className="eyebrow">Add photos</p>
             <h1>What would you like removed?</h1>
-            <p className="lede">Add a few photos to get prices and pickup times.</p>
             <Card className="upload-card">
               <input ref={fileRef} className="sr-only" id="photos" type="file" accept="image/*" multiple capture="environment" onChange={(event) => handleFiles(event.target.files)} />
               <button type="button" className="drop-zone" onClick={() => fileRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); handleFiles(event.dataTransfer.files); }}>
@@ -141,16 +139,13 @@ export function BookingExperience() {
         <div className="booking-grid">
           <div>
             <button type="button" className="back-link" onClick={() => setStep("upload")}>← Back</button>
-            <p className="eyebrow">Pickup details</p>
-            <h1>Where should we pick this up?</h1>
-            <p className="lede">Add the address and any access details.</p>
+            <h1>Pickup address and access</h1>
             <div className="form-stack">
               <label>Pickup address<div className="input-with-icon"><MapPinIcon /><Input value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" /></div></label>
               <fieldset><legend>Where are the items?</legend><div className="choice-grid">{locations.map((item) => <button type="button" key={item} className={location === item ? "choice selected" : "choice"} onClick={() => setLocation(item)}>{item}</button>)}</div></fieldset>
               {location === "Inside" && <fieldset><legend>Are there stairs?</legend><div className="choice-grid three">{["No", "Yes", "Elevator available"].map((item) => <button type="button" key={item} className={stairs === item ? "choice selected" : "choice"} onClick={() => setStairs(item)}>{item}</button>)}</div></fieldset>}
               <label>Anything else?<Textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Gate code, parking, heavy items, or other details" /></label>
               <Button disabled={address.trim().length < 8} onClick={sendRequest}>Get quotes <ArrowRightIcon /></Button>
-              <p className="reassurance">Free request. No obligation.</p>
             </div>
           </div>
           <BookingAside photos={photos} />
@@ -158,13 +153,11 @@ export function BookingExperience() {
       )}
 
       {step === "sent" && (
-        <div className="center-panel">
+        <div className="center-panel compact-state-panel">
           <span className="success-mark"><CheckIcon /></span>
-          <p className="eyebrow">Request received</p>
-          <h1>Your quotes are coming.</h1>
-          <p className="lede">We’ll let you know when they are ready.</p>
-          <Card className="status-card">
-            <div className="timeline"><span className="done">Request sent</span><span className={quotesReady ? "done" : ""}>Quotes arriving</span><span className={quotesReady ? "done" : ""}>Ready to compare</span></div>
+          <h1>Quotes are coming</h1>
+          <Card className="status-card compact-status-card">
+            <div className="timeline"><span className="done">Request sent</span><span className={quotesReady ? "done" : ""}>Quotes arriving</span><span className={quotesReady ? "done" : ""}>Ready</span></div>
             <b>{statusText}</b>
           </Card>
           <label className="contact-field">Send my quotes to<Input value={contact} onChange={(event) => setContact(event.target.value)} placeholder="Mobile number or email" /></label>
@@ -175,8 +168,8 @@ export function BookingExperience() {
 
       {step === "quotes" && (
         <div className="quotes-panel">
-          <div className="section-heading"><div><p className="eyebrow">3 quotes</p><h1>Choose the price and pickup time that work for you.</h1></div><label className="sort-control">Sort<select value={sort} onChange={(event) => setSort(event.target.value as SortOption)} aria-label="Sort quotes" className="select"><option>Recommended</option><option>Lowest price</option><option>Soonest pickup</option><option>Highest rated</option></select></label></div>
-          <div className="quote-grid">{sortedQuotes.map((quote) => <QuoteCard key={quote.id} quote={quote} onChoose={() => { setSelectedQuote(quote); setStep("confirm"); }} />)}</div>
+          <div className="section-heading compact-quote-heading"><h1>Choose a quote</h1><label className="sort-control">Sort<select value={sort} onChange={(event) => setSort(event.target.value as SortOption)} aria-label="Sort quotes" className="select"><option>Recommended</option><option>Lowest price</option><option>Soonest pickup</option><option>Highest rated</option></select></label></div>
+          <div className="quote-list">{sortedQuotes.map((quote) => <QuoteCard key={quote.id} quote={quote} onChoose={() => { setSelectedQuote(quote); setStep("confirm"); }} />)}</div>
           <p className="quotes-footnote">Prices include labor, loading, hauling, and disposal unless noted.</p>
         </div>
       )}
@@ -185,9 +178,8 @@ export function BookingExperience() {
         <div className="booking-grid narrow-grid">
           <div>
             <button type="button" className="back-link" onClick={() => setStep("quotes")}>← Back to quotes</button>
-            <p className="eyebrow">Confirm</p>
-            <h1>Confirm your pickup</h1>
-            <Card className="summary-card"><div><small>Provider</small><b>{selectedQuote.provider}</b></div><div><small>Pickup</small><b>{selectedQuote.window}</b></div><div><small>Total</small><b className="mono-value">{formatCurrency(selectedQuote.total)}</b></div><div><small>Address</small><b>{address}</b></div></Card>
+            <h1>Confirm pickup</h1>
+            <Card className="summary-card compact-summary-card"><div><small>Provider</small><b>{selectedQuote.provider}</b></div><div><small>Pickup</small><b>{selectedQuote.window}</b></div><div><small>Total</small><b className="mono-value">{formatCurrency(selectedQuote.total)}</b></div><div><small>Address</small><b>{address}</b></div></Card>
             <div className="form-stack">
               <label>Name<Input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label>
               <label>Mobile number<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></label>
@@ -201,12 +193,11 @@ export function BookingExperience() {
       )}
 
       {step === "booked" && selectedQuote && (
-        <div className="center-panel">
+        <div className="center-panel compact-state-panel">
           <span className="success-mark"><CheckIcon /></span>
-          <p className="eyebrow">Confirmed</p>
-          <h1>Your pickup is booked.</h1>
-          <p className="lede">{selectedQuote.provider} will arrive {selectedQuote.window.toLowerCase()}.</p>
-          <Card className="status-card booking-receipt"><b className="mono-value">{formatCurrency(selectedQuote.total)}</b><span>{address}</span><span>{paymentMethod} · Updates sent to {phone}</span></Card>
+          <h1>Pickup booked</h1>
+          <p className="booking-provider-line">{selectedQuote.provider} · {selectedQuote.window}</p>
+          <Card className="status-card booking-receipt compact-receipt"><b className="mono-value">{formatCurrency(selectedQuote.total)}</b><span>{address}</span><span>{paymentMethod} · Updates sent to {phone}</span></Card>
           <Button onClick={resetRequest}>Book another pickup</Button>
           <div className="secondary-actions"><button type="button" onClick={() => showNotice("Messaging will be available shortly.")}>Message provider</button><button type="button" onClick={() => setStep("details")}>Change pickup</button><button type="button" onClick={() => { resetRequest(); showNotice("Booking cancelled. No charge was made."); }}>Cancel booking</button></div>
         </div>
@@ -218,10 +209,10 @@ export function BookingExperience() {
 function BookingAside({ photos }: { photos: Photo[] }) {
   return (
     <aside className="booking-aside">
-      <Card>
+      <Card className="item-summary-card">
         <div className="aside-head"><b>Your items</b><span>{photos.length} photos</span></div>
-        {photos.length ? <div className="aside-photos">{photos.slice(0, 4).map((photo, index) => <img key={`${photo.name}-${index}`} src={photo.url} alt="" />)}</div> : <div className="empty-preview"><CameraIcon /><span>Photos appear here</span></div>}
-        <div className="estimate"><small>Estimated range</small><strong>$180–$320</strong><p>Your final price is shown before booking.</p></div>
+        {photos.length ? <div className="aside-photos">{photos.slice(0, 4).map((photo, index) => <img key={`${photo.name}-${index}`} src={photo.url} alt="" />)}</div> : <div className="compact-empty-preview"><CameraIcon /><span>Add photos for a faster quote</span></div>}
+        <div className="estimate compact-estimate"><div><small>Estimated range</small><strong>$180–$320</strong></div><p>Final price shown before booking.</p></div>
       </Card>
       <div className="trust-list" id="trust"><span><ShieldCheckIcon /> Insurance status</span><span><StarIcon /> Ratings and completed jobs</span><span><CheckIcon /> Price changes require approval</span></div>
     </aside>
@@ -230,16 +221,19 @@ function BookingAside({ photos }: { photos: Photo[] }) {
 
 function QuoteCard({ quote, onChoose }: { quote: Quote; onChoose: () => void }) {
   const [open, setOpen] = useState(false);
+
   return (
-    <Card className="quote-card">
-      {quote.label && <span className="recommendation">{quote.label}</span>}
-      <div className="quote-header"><strong className="quote-price">{formatCurrency(quote.total)}</strong><span>total</span></div>
-      <b className="quote-window"><ClockIcon /> {quote.window}</b>
-      <div className="provider-block"><h2>{quote.provider}</h2><p><StarIcon /> {quote.rating} · {quote.completedJobs} completed jobs</p><span><ShieldCheckIcon /> {quote.verified ? "Insurance verified" : "Insurance status unavailable"}</span></div>
-      <div className="included"><small>Included</small><p>{quote.included.join(" · ")}</p></div>
-      {open && <div className="quote-details"><p>Free cancellation up to two hours before pickup.</p><p>Any price change requires your approval.</p></div>}
-      <Button onClick={onChoose}>Choose <ArrowRightIcon /></Button>
-      <button type="button" className="text-link" onClick={() => setOpen((value) => !value)}>{open ? "Hide details" : "View details"}</button>
+    <Card className="quote-card compact-quote-card">
+      <div className="compact-quote-main">
+        <div className="compact-provider-copy">
+          <div className="compact-provider-title">{quote.label && <span className="recommendation">{quote.label}</span>}<h2>{quote.provider}</h2></div>
+          <div className="compact-provider-meta"><span><StarIcon /> {quote.rating} · {quote.completedJobs} jobs</span><span><ShieldCheckIcon /> {quote.verified ? "Insurance verified" : "Insurance unavailable"}</span></div>
+          <p className="compact-included">{quote.included.join(" · ")}</p>
+        </div>
+        <div className="compact-quote-price"><strong>{formatCurrency(quote.total)}</strong><span><ClockIcon /> {quote.window}</span></div>
+        <div className="compact-quote-actions"><Button onClick={onChoose}>Choose <ArrowRightIcon /></Button><button type="button" className="text-link" onClick={() => setOpen((value) => !value)}>{open ? "Hide" : "Details"}</button></div>
+      </div>
+      {open && <div className="quote-details compact-quote-details"><span>Free cancellation up to two hours before pickup.</span><span>Any price change requires your approval.</span></div>}
     </Card>
   );
 }
