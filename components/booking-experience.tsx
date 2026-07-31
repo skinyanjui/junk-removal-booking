@@ -12,10 +12,10 @@ type SortOption = "Recommended" | "Lowest price" | "Soonest pickup" | "Highest r
 type PaymentMethod = "Card" | "Apple Pay" | "Google Pay";
 
 const locations = ["Curbside", "Garage", "Inside", "Other"];
-const paymentMethods: { name: PaymentMethod; mark: string }[] = [
-  { name: "Card", mark: "••••" },
-  { name: "Apple Pay", mark: "A" },
-  { name: "Google Pay", mark: "G" },
+const paymentMethods: { name: PaymentMethod; mark: string; detail: string }[] = [
+  { name: "Card", mark: "••••", detail: "Visa · Mastercard" },
+  { name: "Apple Pay", mark: "A", detail: "Fast checkout" },
+  { name: "Google Pay", mark: "G", detail: "Fast checkout" },
 ];
 
 export function BookingExperience() {
@@ -182,28 +182,33 @@ export function BookingExperience() {
       {step === "confirm" && selectedQuote && (
         <div className="confirm-panel booking-step booking-step-confirm">
           <button type="button" className="back-link" onClick={() => setStep("quotes")}>← Back</button>
-          <h1>Confirm pickup</h1>
-          <Card className="summary-card compact-summary-card"><div><small>Provider</small><b>{selectedQuote.provider}</b></div><div><small>Pickup</small><b>{selectedQuote.window}</b></div><div><small>Total</small><b className="mono-value">{formatCurrency(selectedQuote.total)}</b></div><div><small>Address</small><b>{address}</b></div></Card>
-          <div className="form-stack compact-confirm-form">
-            <div className="identity-fields"><label>Name<Input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label><label>Mobile number<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></label></div>
-            <fieldset>
-              <legend>Payment</legend>
-              <div className="payment-methods">
-                {paymentMethods.map((method) => {
-                  const selected = paymentMethod === method.name;
-                  return (
-                    <button type="button" key={method.name} className={selected ? "payment-option selected" : "payment-option"} aria-pressed={selected} onClick={() => setPaymentMethod(method.name)}>
-                      <span className="payment-mark" aria-hidden="true">{method.mark}</span>
-                      <span>{method.name}</span>
-                      {selected ? <CheckIcon /> : null}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-            <div className="authorization"><b>{formatCurrency(selectedQuote.total)}</b> approved · Changes require approval</div>
-            <Button disabled={!name.trim() || phone.trim().length < 7} onClick={() => setStep("booked")}>Book pickup <ArrowRightIcon /></Button>
-          </div>
+          <div className="checkout-heading"><div><h1>Confirm pickup</h1><p>Review your booking and choose a payment method.</p></div><span className="secure-checkout"><ShieldCheckIcon /> Secure checkout</span></div>
+          <Card className="checkout-card">
+            <div className="checkout-summary">
+              <div className="checkout-provider"><small>Provider</small><strong>{selectedQuote.provider}</strong><span>{selectedQuote.window}</span></div>
+              <div className="checkout-address"><small>Pickup address</small><b>{address}</b></div>
+              <div className="checkout-total"><small>Total</small><strong>{formatCurrency(selectedQuote.total)}</strong></div>
+            </div>
+            <div className="checkout-body">
+              <div className="identity-fields"><label>Name<Input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label><label>Mobile number<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></label></div>
+              <fieldset className="payment-section">
+                <legend>Payment method</legend>
+                <div className="modern-payment-grid">
+                  {paymentMethods.map((method) => {
+                    const selected = paymentMethod === method.name;
+                    return (
+                      <button type="button" key={method.name} className={selected ? "modern-payment-option selected" : "modern-payment-option"} aria-pressed={selected} onClick={() => setPaymentMethod(method.name)}>
+                        <span className="modern-payment-mark" aria-hidden="true">{method.mark}</span>
+                        <span className="modern-payment-copy"><b>{method.name}</b><small>{method.detail}</small></span>
+                        <span className="modern-payment-check" aria-hidden="true">{selected ? <CheckIcon /> : null}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            </div>
+            <div className="checkout-footer"><span className="checkout-protection"><ShieldCheckIcon /> Price changes require your approval.</span><Button disabled={!name.trim() || phone.trim().length < 7} onClick={() => setStep("booked")}>Book pickup <ArrowRightIcon /></Button></div>
+          </Card>
         </div>
       )}
 
