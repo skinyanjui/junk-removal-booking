@@ -1,0 +1,99 @@
+/* Minimal three-step booking progress */
+
+.compact-booking-progress {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 3px;
+  margin: 0 auto 20px;
+  padding: 3px;
+  border: 1px solid var(--geist-border);
+  border-radius: 12px;
+  background: var(--geist-surface-subtle);
+  color: var(--geist-text-tertiary);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.compact-booking-progress::before {
+  display: none;
+}
+
+.compact-booking-progress span,
+.compact-booking-progress span.active {
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--geist-text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.compact-booking-progress span.active:not([aria-current="step"]) {
+  color: var(--geist-accent-strong);
+}
+
+.compact-booking-progress span[aria-current="step"] {
+  background: var(--geist-text);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+.compact-booking-progress i,
+.compact-booking-progress span.active i {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0;
+  font-style: normal;
+  line-height: 1;
+}
+
+.compact-booking-progress i svg {
+  display: none;
+}
+
+.compact-booking-progress span:nth-child(1) i::before {
+  content: "1";
+}
+
+.compact-booking-progress span:nth-child(2) i::before {
+  content: "2";
+}
+
+.compact-booking-progress span:nth-child(3) i::before {
+  content: "3";
+}
+
+.compact-booking-progress i::before {
+  font-size: 10px;
+  font-weight: 650;
+}
+
+@media (max-width: 430px) {
+  .compact-booking-progress {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .compact-booking-progress span,
+  .compact-booking-progress span.active {
+    gap: 5px;
+    padding-inline: 6px;
+  }
+}
