@@ -12,18 +12,37 @@ type SortOption = "Recommended" | "Lowest price" | "Soonest pickup" | "Highest r
 type PaymentMethod = "Card" | "Apple Pay" | "Google Pay";
 
 const locations = ["Curbside", "Garage", "Inside", "Other"];
+const accessOptions = ["No stairs", "Stairs", "Elevator"];
 const paymentMethods: { name: PaymentMethod; mark: string; detail: string }[] = [
   { name: "Card", mark: "••••", detail: "Visa · Mastercard" },
   { name: "Apple Pay", mark: "A", detail: "Fast checkout" },
   { name: "Google Pay", mark: "G", detail: "Fast checkout" },
 ];
 
+const pickupOrder: Record<string, number> = {
+  "Today, 2–4 PM": 1,
+  "Today, 4–6 PM": 2,
+  "Tomorrow, 8–10 AM": 3,
+  "Tomorrow, 12–2 PM": 4,
+};
+
+function isValidContact(value: string) {
+  const contact = value.trim();
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+  const phoneValid = contact.replace(/\D/g, "").length >= 10;
+  return emailValid || phoneValid;
+}
+
+function isValidPhone(value: string) {
+  return value.replace(/\D/g, "").length >= 10;
+}
+
 export function BookingExperience() {
   const [step, setStep] = useState<Step>("upload");
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [address, setAddress] = useState("120 SE 4th St, Evansville, IN 47708");
+  const [address, setAddress] = useState("");
   const [location, setLocation] = useState("Curbside");
-  const [stairs, setStairs] = useState("No");
+  const [stairs, setStairs] = useState("No stairs");
   const [notes, setNotes] = useState("");
   const [contact, setContact] = useState("");
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
@@ -36,9 +55,15 @@ export function BookingExperience() {
   const [notice, setNotice] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const photosRef = useRef<Photo[]>([]);
+  const quoteTimerRef = useRef<number | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
 
   useEffect(() => { photosRef.current = photos; }, [photos]);
-  useEffect(() => () => photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.url)), []);
+  useEffect(() => () => {
+    photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.url));
+    if (quoteTimerRef.current) window.clearTimeout(quoteTimerRef.current);
+    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+  }, []);
 
   const progress = useMemo(() => {
     if (step === "upload" || step === "details") return 1;
@@ -49,18 +74,30 @@ export function BookingExperience() {
   const sortedQuotes = useMemo(() => {
     const list = [...quotes];
     if (sort === "Lowest price") return list.sort((a, b) => a.total - b.total);
-    if (sort === "Soonest pickup") return list.sort((a, b) => a.window.localeCompare(b.window));
-    if (sort === "Highest rated") return list.sort((a, b) => b.rating - a.rating);
+    if (sort === "Soonest pickup") return list.sort((a, b) => (pickupOrder[a.window] ?? 99) - (pickupOrder[b.window] ?? 99));
+    if (sort === "Highest rated") return list.sort((a, b) => b.rating - a.rating || b.completedJobs - a.completedJobs);
     return list;
   }, [sort]);
 
+  function showNotice(message: string) {
+    setNotice(message);
+    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = window.setTimeout(() => setNotice(""), 3200);
+  }
+
   function handleFiles(files: FileList | null) {
-    if (!files) return;
+    if (!files?.length) return;
     const available = 8 - photos.length;
-    const validFiles = Array.from(files).filter((file) => file.type.startsWith("image/")).slice(0, available);
+    if (available <= 0) {
+      showNotice("You can upload up to eight photos.");
+      return;
+    }
+    const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    const validFiles = imageFiles.slice(0, available);
     const next = validFiles.map((file) => ({ name: file.name, url: URL.createObjectURL(file) }));
     setPhotos((current) => [...current, ...next]);
-    setNotice(validFiles.length < files.length ? "Only image files were added. You can upload up to eight photos." : "");
+    if (imageFiles.length !== files.length) showNotice("Only image files can be added.");
+    else if (imageFiles.length > available) showNotice("Only the first eight photos were added.");
   }
 
   function removePhoto(index: number) {
@@ -72,10 +109,16 @@ export function BookingExperience() {
   }
 
   function sendRequest() {
+    if (address.trim().length < 8) {
+      showNotice("Enter a complete pickup address.");
+      return;
+    }
+    setSelectedQuote(null);
     setStep("sent");
     setQuotesReady(false);
     setStatusText("Quotes are on the way");
-    window.setTimeout(() => {
+    if (quoteTimerRef.current) window.clearTimeout(quoteTimerRef.current);
+    quoteTimerRef.current = window.setTimeout(() => {
       setStatusText("3 quotes ready");
       setQuotesReady(true);
     }, 1100);
@@ -83,23 +126,34 @@ export function BookingExperience() {
 
   function resetRequest() {
     photos.forEach((photo) => URL.revokeObjectURL(photo.url));
+    if (quoteTimerRef.current) window.clearTimeout(quoteTimerRef.current);
     setPhotos([]);
+    setAddress("");
+    setLocation("Curbside");
+    setStairs("No stairs");
+    setNotes("");
+    setContact("");
     setSelectedQuote(null);
-    setStep("upload");
+    setName("");
+    setPhone("");
+    setPaymentMethod("Card");
+    setStatusText("Quotes are on the way");
     setQuotesReady(false);
+    setSort("Recommended");
     setNotice("");
+    setStep("upload");
   }
 
-  function showNotice(message: string) {
-    setNotice(message);
-    window.setTimeout(() => setNotice(""), 2600);
+  function changePickup() {
+    setSelectedQuote(null);
+    setStep("details");
   }
 
   return (
     <section className="booking-shell" aria-live="polite">
       <div className="progress compact-booking-progress" aria-label={`Booking stage ${progress} of 3`}>
         {["Photos", "Quotes", "Book"].map((label, index) => (
-          <span key={label} className={progress >= index + 1 ? "active" : ""}>
+          <span key={label} className={progress >= index + 1 ? "active" : ""} aria-current={progress === index + 1 ? "step" : undefined}>
             <i>{progress > index + 1 ? <CheckIcon /> : index + 1}</i>{label}
           </span>
         ))}
@@ -112,13 +166,13 @@ export function BookingExperience() {
           <div>
             <h1>What would you like removed?</h1>
             <Card className="upload-card compact-upload-card">
-              <input ref={fileRef} className="sr-only" id="photos" type="file" accept="image/*" multiple capture="environment" onChange={(event) => handleFiles(event.target.files)} />
+              <input ref={fileRef} className="sr-only" id="photos" type="file" accept="image/*" multiple capture="environment" onChange={(event) => { handleFiles(event.target.files); event.currentTarget.value = ""; }} />
               <button type="button" className="drop-zone compact-drop-zone" onClick={() => fileRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); handleFiles(event.dataTransfer.files); }}>
                 <span className="upload-icon" aria-hidden="true">{photos.length ? <ImageIcon /> : <UploadIcon />}</span>
-                <span className="upload-copy"><b>{photos.length ? "Add more photos" : "Take or choose photos"}</b><small>Up to 8 images</small></span>
+                <span className="upload-copy"><b>{photos.length ? "Add more photos" : "Take or choose photos"}</b><small>{photos.length}/8 added</small></span>
               </button>
               {photos.length > 0 && (
-                <div className="photo-grid compact-photo-strip">
+                <div className="photo-grid compact-photo-strip" aria-label="Uploaded photos">
                   {photos.map((photo, index) => (
                     <figure key={`${photo.name}-${index}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -145,9 +199,9 @@ export function BookingExperience() {
             <button type="button" className="back-link" onClick={() => setStep("upload")}>← Back</button>
             <h1>Pickup details</h1>
             <div className="form-stack compact-booking-form">
-              <label>Address<div className="input-with-icon"><MapPinIcon /><Input value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" /></div></label>
-              <fieldset><legend>Item location</legend><div className="choice-grid compact-choice-row">{locations.map((item) => <button type="button" key={item} className={location === item ? "choice selected" : "choice"} onClick={() => setLocation(item)}>{item}</button>)}</div></fieldset>
-              {location === "Inside" && <fieldset><legend>Access</legend><div className="choice-grid compact-choice-row">{["No stairs", "Stairs", "Elevator"].map((item) => <button type="button" key={item} className={stairs === item ? "choice selected" : "choice"} onClick={() => setStairs(item)}>{item}</button>)}</div></fieldset>}
+              <label>Address<div className="input-with-icon"><MapPinIcon /><Input required value={address} onChange={(event) => setAddress(event.target.value)} placeholder="Street address, city, state ZIP" autoComplete="street-address" /></div></label>
+              <fieldset><legend>Item location</legend><div className="choice-grid compact-choice-row">{locations.map((item) => <button type="button" key={item} className={location === item ? "choice selected" : "choice"} aria-pressed={location === item} onClick={() => setLocation(item)}>{item}</button>)}</div></fieldset>
+              {location === "Inside" && <fieldset><legend>Access</legend><div className="choice-grid compact-choice-row">{accessOptions.map((item) => <button type="button" key={item} className={stairs === item ? "choice selected" : "choice"} aria-pressed={stairs === item} onClick={() => setStairs(item)}>{item}</button>)}</div></fieldset>}
               <label>Notes <span className="optional-label">Optional</span><Textarea rows={2} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Gate code, parking, heavy items, or access" /></label>
               <div className="compact-step-actions"><Button disabled={address.trim().length < 8} onClick={sendRequest}>Get quotes <ArrowRightIcon /></Button><span className="action-note">Free · No obligation</span></div>
             </div>
@@ -164,8 +218,8 @@ export function BookingExperience() {
             <span className={quotesReady ? "quote-count ready" : "quote-count"}>{quotesReady ? "3 ready" : "Finding quotes"}</span>
           </Card>
           <div className="quote-contact-row">
-            <label className="contact-field">Send quotes to<Input value={contact} onChange={(event) => setContact(event.target.value)} placeholder="Mobile number or email" /></label>
-            <Button disabled={!quotesReady || contact.trim().length < 5} onClick={() => setStep("quotes")}>{quotesReady ? "View quotes" : "Waiting…"}</Button>
+            <label className="contact-field">Send quotes to<Input required value={contact} onChange={(event) => setContact(event.target.value)} placeholder="Mobile number or email" aria-invalid={contact.length > 0 && !isValidContact(contact)} /></label>
+            <Button disabled={!quotesReady || !isValidContact(contact)} onClick={() => setStep("quotes")}>{quotesReady ? "View quotes" : "Waiting…"}</Button>
           </div>
           <div className="secondary-actions compact-secondary-actions"><button type="button" onClick={() => setStep("upload")}>Add photo</button><button type="button" onClick={() => setStep("details")}>Edit</button><button type="button" onClick={resetRequest}>Cancel</button></div>
         </div>
@@ -182,7 +236,7 @@ export function BookingExperience() {
       {step === "confirm" && selectedQuote && (
         <div className="confirm-panel booking-step booking-step-confirm">
           <button type="button" className="back-link" onClick={() => setStep("quotes")}>← Back</button>
-          <div className="checkout-heading"><div><h1>Confirm pickup</h1><p>Review your booking and choose a payment method.</p></div><span className="secure-checkout"><ShieldCheckIcon /> Secure checkout</span></div>
+          <div className="checkout-heading"><div><h1>Confirm pickup</h1><p>Review your booking and choose a payment method.</p></div><span className="secure-checkout"><ShieldCheckIcon /> Price protected</span></div>
           <Card className="checkout-card">
             <div className="checkout-summary">
               <div className="checkout-provider"><small>Provider</small><strong>{selectedQuote.provider}</strong><span>{selectedQuote.window}</span></div>
@@ -190,7 +244,7 @@ export function BookingExperience() {
               <div className="checkout-total"><small>Total</small><strong>{formatCurrency(selectedQuote.total)}</strong></div>
             </div>
             <div className="checkout-body">
-              <div className="identity-fields"><label>Name<Input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label><label>Mobile number<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></label></div>
+              <div className="identity-fields"><label>Name<Input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label><label>Mobile number<Input required value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" placeholder="(812) 555-0123" aria-invalid={phone.length > 0 && !isValidPhone(phone)} /></label></div>
               <fieldset className="payment-section">
                 <legend>Payment method</legend>
                 <div className="modern-payment-grid">
@@ -207,7 +261,7 @@ export function BookingExperience() {
                 </div>
               </fieldset>
             </div>
-            <div className="checkout-footer"><span className="checkout-protection"><ShieldCheckIcon /> Price changes require your approval.</span><Button disabled={!name.trim() || phone.trim().length < 7} onClick={() => setStep("booked")}>Book pickup <ArrowRightIcon /></Button></div>
+            <div className="checkout-footer"><span className="checkout-protection"><ShieldCheckIcon /> Price changes require your approval.</span><Button disabled={!name.trim() || !isValidPhone(phone)} onClick={() => setStep("booked")}>Book pickup <ArrowRightIcon /></Button></div>
           </Card>
         </div>
       )}
@@ -217,7 +271,7 @@ export function BookingExperience() {
           <div className="compact-state-heading"><span className="success-mark"><CheckIcon /></span><h1>Pickup booked</h1></div>
           <Card className="compact-receipt-grid"><div><small>Total</small><b className="mono-value">{formatCurrency(selectedQuote.total)}</b></div><div><small>Pickup</small><b>{selectedQuote.provider} · {selectedQuote.window}</b></div><div><small>Updates</small><b>{paymentMethod} · {phone}</b></div></Card>
           <p className="receipt-address">{address}</p>
-          <div className="booked-actions"><Button onClick={resetRequest}>Book another pickup</Button><div className="secondary-actions"><button type="button" onClick={() => showNotice("Messaging will be available shortly.")}>Message</button><button type="button" onClick={() => setStep("details")}>Change</button><button type="button" onClick={() => { resetRequest(); showNotice("Booking cancelled. No charge was made."); }}>Cancel</button></div></div>
+          <div className="booked-actions"><Button onClick={resetRequest}>Book another pickup</Button><div className="secondary-actions"><button type="button" onClick={() => showNotice("Messaging is not connected in this prototype.")}>Message</button><button type="button" onClick={changePickup}>Change</button><button type="button" onClick={() => { resetRequest(); showNotice("Booking cancelled. No charge was made."); }}>Cancel</button></div></div>
         </div>
       )}
     </section>
@@ -232,13 +286,14 @@ function BookingAside({ photos }: { photos: Photo[] }) {
         {photos.length ? <div className="aside-photos compact-aside-photos">{photos.slice(0, 4).map((photo, index) => <img key={`${photo.name}-${index}`} src={photo.url} alt="" />)}</div> : <div className="compact-empty-preview"><CameraIcon /><span>Add photos for a faster quote</span></div>}
         <div className="estimate compact-estimate"><div><small>Estimated range</small><strong>$180–$320</strong></div><p>Final price before booking.</p></div>
       </Card>
-      <div className="trust-list compact-trust-list" id="trust"><span><ShieldCheckIcon /> Insurance</span><span><StarIcon /> Ratings</span><span><CheckIcon /> Price approval</span></div>
+      <div className="trust-list compact-trust-list"><span><ShieldCheckIcon /> Insurance</span><span><StarIcon /> Ratings</span><span><CheckIcon /> Price approval</span></div>
     </aside>
   );
 }
 
 function QuoteCard({ quote, onChoose }: { quote: Quote; onChoose: () => void }) {
   const [open, setOpen] = useState(false);
+  const detailsId = `quote-details-${quote.id}`;
 
   return (
     <Card className="quote-card compact-quote-card">
@@ -249,9 +304,9 @@ function QuoteCard({ quote, onChoose }: { quote: Quote; onChoose: () => void }) 
           <p className="compact-included">{quote.included.join(" · ")}</p>
         </div>
         <div className="compact-quote-price"><strong>{formatCurrency(quote.total)}</strong><span><ClockIcon /> {quote.window}</span></div>
-        <div className="compact-quote-actions"><Button onClick={onChoose}>Choose <ArrowRightIcon /></Button><button type="button" className="text-link" aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? "Hide" : "Details"}</button></div>
+        <div className="compact-quote-actions"><Button onClick={onChoose}>Choose <ArrowRightIcon /></Button><button type="button" className="text-link" aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen((value) => !value)}>{open ? "Hide" : "Details"}</button></div>
       </div>
-      {open && <div className="quote-details compact-quote-details"><span>Free cancellation up to two hours before pickup.</span><span>Price changes require approval.</span></div>}
+      {open && <div id={detailsId} className="quote-details compact-quote-details"><span>Free cancellation up to two hours before pickup.</span><span>Price changes require approval.</span></div>}
     </Card>
   );
 }
