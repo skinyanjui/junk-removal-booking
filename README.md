@@ -38,3 +38,7 @@ pnpm build
 6. Providers choose the ZIP codes where they receive opportunities.
 
 See [`docs/MASTER_PRODUCT_BRIEF.md`](docs/MASTER_PRODUCT_BRIEF.md) for the complete source-of-truth brief.
+
+## Design system
+
+See [`docs/GEIST_DESIGN_SYSTEM.md`](docs/GEIST_DESIGN_SYSTEM.md) for the shared Geist typography, token, component, and interaction standard.
